@@ -2,5 +2,5 @@ Atividade realizado pelos alunos:
 
 *Wilson Francisco do Nascimento*
 
-*Vinícius Souza Pinto Sales Sobral*
+*Gilton Francisco de Souza Santos*
 
