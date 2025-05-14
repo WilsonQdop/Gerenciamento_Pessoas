@@ -3,6 +3,7 @@ package com.Github.WilsonQdop.Pessoas.controllers;
 import com.Github.WilsonQdop.Pessoas.dtos.PeoplesDTO;
 import com.Github.WilsonQdop.Pessoas.entities.PeoplesEntity;
 import com.Github.WilsonQdop.Pessoas.repositories.PeoplesRepository;
+import com.Github.WilsonQdop.Pessoas.services.PeopleService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,24 +19,32 @@ import java.util.UUID;
 public class PeoplesController {
 
     @Autowired
-    private PeoplesRepository peoplesRepository;
+    private PeopleService peopleService;
 
     @PostMapping
-    public ResponseEntity<PeoplesEntity> addPeople (@RequestBody PeoplesDTO peoplesDTO) {
-        PeoplesEntity people = new PeoplesEntity();
-        BeanUtils.copyProperties(peoplesDTO, people);
+    public ResponseEntity<PeoplesEntity> createPeople(@RequestBody PeoplesEntity data) {
+        PeoplesEntity newPeople = this.peopleService.createPeople(data);
 
-        PeoplesEntity savedPeople = this.peoplesRepository.save(people);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPeople);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newPeople);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> returnPeople (@PathVariable UUID id) {
-        Optional<PeoplesEntity> foundPeople = this.peoplesRepository.findById(id);
+    public ResponseEntity<PeoplesEntity> findPeople(@PathVariable UUID id) {
+        PeoplesEntity findPeople = this.peopleService.findPeople(id);
 
-        return foundPeople.<ResponseEntity<Object>>map(peoplesEntity -> ResponseEntity.status(HttpStatus.OK).body(peoplesEntity))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada! "));
+        return ResponseEntity.status(HttpStatus.OK).body(findPeople);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deletePeople(@PathVariable UUID id) {
+        this.peopleService.deletePeople(id);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<PeoplesEntity> updatePeople(@PathVariable UUID id, @RequestBody PeoplesEntity data) {
+        PeoplesEntity people = this.peopleService.updatePeople(data, id);
+        return ResponseEntity.status(HttpStatus.OK).body(people);
     }
 
 }
